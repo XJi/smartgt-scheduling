@@ -2,9 +2,9 @@ var express = require('express');
 var session = require('express-session')
 var https = require('https');
 var parseString = require('xml2js').parseString;
-
 var os = require("os");
 var hostname = os.hostname();
+var fs = require('fs');
 console.log("Current Hostname: %s",hostname);
 
 var ips = [];
@@ -30,11 +30,11 @@ var dns = require("dns");
 ips.forEach(function (ip){
   dns.reverse(ip, function (err, ipNames){
     console.log("Found additional hostnames %s",ipNames);
-    ipNames.forEach(function(ipName){
+    /*ipNames.forEach(function(ipName){
       if(ipName.endsWith('gatech.edu')){
         hostname = ipNames[0];
       }
-    });
+    });*/
   });
 })
 
@@ -64,16 +64,19 @@ app.get('/*', function (req, res) {
 
   console.log(baseURL);
 
-/*
-* Here we have assign the 'session' to 'sess'.
-* Now we can create any number of session variable we want.
-* in PHP we do as $_SESSION['var name'].
-* Here we do like this.
-*/
 if(sess.username !== undefined){
     //Already logged in before
     console.log('Hello '+sess.username+'!');
-    res.redirect(302,'http://m.gatech.edu/api/schedule/myschedule');
+    //res.redirect(302,'http://m.gatech.edu/api/schedule/myschedule');
+    res.redirect(302,'https://www.google.com/#q=gatech');
+    var request = require('request');
+/*request('http://www.google.com', function (error, response, body) {
+  console.log('error:', error); // Print the error if one occurred
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+  console.log('body:', body); // Print the HTML for the Google homepage.
+});*/
+    request.get('http://www.facebook.com').pipe(fs.createWriteStream('content.txt'));
+
     //console.log(data);
   }else if(req.query.ticket !== undefined){
     //Check to see if this is a login request
