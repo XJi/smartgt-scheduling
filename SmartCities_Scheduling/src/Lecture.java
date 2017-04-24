@@ -1,8 +1,10 @@
+import java.util.Comparator;
 
 public class Lecture {
 	private String day;
 	private int startTime;
 	private int endTime;
+	
 	
 	Lecture(String day, int startTime, int endTime){
 		this.day = day;
@@ -32,4 +34,5 @@ public class Lecture {
 	public int getEndTime(){
 		return this.endTime;
 	}
+	
 }
