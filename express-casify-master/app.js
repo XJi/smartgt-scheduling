@@ -67,9 +67,12 @@ app.get('/*', function (req, res) {
 if(sess.username !== undefined){
     //Already logged in before
     console.log('Hello '+sess.username+'!');
-    //res.redirect(302,'http://m.gatech.edu/api/schedule/myschedule');
-    res.redirect(302,'https://www.google.com/#q=gatech');
+    res.redirect(302,'http://m.gatech.edu/api/schedule/myschedule');
+    //res.redirect(302,'https://www.google.com/#q=gatech');
     var request = require('request');
+    request('http://m.gatech.edu/api/schedule/myschedule', function (body) {
+      console.log('body:', body);
+    });
 /*request('http://www.google.com', function (error, response, body) {
   console.log('error:', error); // Print the error if one occurred
   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
@@ -103,7 +106,7 @@ if(sess.username !== undefined){
               //Login Failed Try Again: May cause infinite browser redirect loop
               res.redirect(302,'https://login.gatech.edu/cas/login?service='+encodeURIComponent(baseURL));
             }
-            console.dir(JSON.stringify(result));
+            console.dir(JSON.stringify(sucessResult));
           }else{
             res.send('Unable To Process CAS Response')
           }
