@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.json.simple.*;
@@ -16,15 +17,17 @@ static int STUDENT_ID = 101;
 		JSONArray jsonObject = readFile("schedule.json");
 		
 		JSONArray jsonArray = (JSONArray) jsonObject.get(0);
-		System.out.println(jsonArray.get(0));
-		System.out.println(jsonArray.size());
+//		System.out.println(jsonArray.get(0));
+//		System.out.println(jsonArray.size());
 		Student student = new Student(STUDENT_ID, 0);
 		for (int i=0; i<jsonArray.size(); ++i) {
 			JSONObject temp_jsonObject = (JSONObject) jsonArray.get(i);
 			JSONArray meeting = (JSONArray) temp_jsonObject.get("meeting_times");
 			JSONObject jsonObject3 = (JSONObject) meeting.get(0);
-			Lecture lecture = getLecture(jsonObject3);
-			student.setLectures(lecture);
+			ArrayList<Lecture> lectures = getLectures(jsonObject3);
+			for (Lecture lecture: lectures) {
+				student.setLectures(lecture);
+			}
 		}
 		STUDENT_ID += 1;
 	}
@@ -41,11 +44,17 @@ static int STUDENT_ID = 101;
 		}
 	}
 	
-	public static Lecture getLecture(JSONObject jsonObject) {
+	public static ArrayList<Lecture> getLectures(JSONObject jsonObject) {
+		ArrayList<Lecture> lectures = new ArrayList<>();
 		String day = (String) jsonObject.get("days");
+//		System.out.println(day);
 		int begin_time = Integer.parseInt((String) jsonObject.get("begin_time"));
 		int end_time = Integer.parseInt((String) jsonObject.get("end_time"));
-		Lecture lecture = new Lecture(day, begin_time, end_time);
-		return lecture;
+		for (int i=0; i<day.length(); ++i) {
+//			System.out.println(day.charAt(i));
+			Lecture lecture = new Lecture(Character.toString(day.charAt(i)), begin_time, end_time);
+			lectures.add(lecture);
+		}
+		return lectures;
 	}
 }
