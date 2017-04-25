@@ -1,10 +1,9 @@
 import java.util.Comparator;
 
-public class Lecture {
+public class Lecture implements Comparator{
 	private String day;
 	private int startTime;
 	private int endTime;
-	
 	
 	Lecture(String day, int startTime, int endTime){
 		this.day = day;
@@ -33,6 +32,11 @@ public class Lecture {
 	
 	public int getEndTime(){
 		return this.endTime;
+	}
+	
+	@Override
+	public int compare(Object o1, Object o2) {	
+		return ((Lecture) o1).getEndTime()-((Lecture) o2).getEndTime();
 	}
 	
 }
