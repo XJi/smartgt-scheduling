@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import util.Constant;
@@ -33,9 +35,23 @@ public class Student {
 	public int getID(){
 		return this.id;
 	}
+	public static Comparator<Lecture> getCompByEndtime(){   
+		 Comparator<Lecture> comp = new Comparator<Lecture>(){
+		     @Override
+		     public int compare(Lecture n1, Lecture n2){
+		         return n1.getEndTime()-(n2.getEndTime());
+		     }        
+		 };
+		 return comp;
+	}  
 	public boolean isAvailable(int time, int duration,String weekday){
 		System.out.println("@isAvailable: Startime: "+time+",duration"+duration+",weekday:"+weekday);
 		ArrayList<Lecture> lec = this.getLectures(weekday);
+		Collections.sort(lec, getCompByEndtime());
+		if(time < lec.get(0).getStartTime()){
+			System.out.println("@isAvailable:"+time);
+			return true;
+		}
 		for(int i = 0; i < lec.size(); i++){
 			if(lec.get(i).getEndTime() < time){
 				System.out.println("@isAvailable: getEndTime: "+lec.get(i).getEndTime());

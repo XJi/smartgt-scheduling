@@ -55,10 +55,11 @@ public class Schedule {
 		else temp = this.crc;
 		for(int i = 0; i < temp.size(); i++){
 			if(temp.get(i).getStartTime() >= startTime){
+				
 				if(duration <= Constant.defaultDuration ){
 					if(temp.get(i).getRemain() > 0){
 						temp.get(i).setRemain(-1);  // Remain_space = Remain_space -1
-						System.out.println("@updateSchedule: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i).getEndTime());
+						System.out.println("@updateSchedule simple: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i).getEndTime());
 						sTime = temp.get(i).getStartTime();
 						endTime = temp.get(i).getEndTime();
 						return true;
@@ -68,7 +69,7 @@ public class Schedule {
 					if(i+1 < temp.size() && temp.get(i).getRemain() > 0 && temp.get(i+1).getRemain() > 0){
 						temp.get(i).setRemain(-1);
 						temp.get(i+1).setRemain(-1);
-						System.out.println("@updateSchedule: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i+1).getEndTime());
+						System.out.println("@long updateSchedule: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i+1).getEndTime());
 						sTime = temp.get(i).getStartTime();
 						endTime = temp.get(i+1).getEndTime();
 						return true;

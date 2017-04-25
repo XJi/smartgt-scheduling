@@ -70,15 +70,20 @@ public class Main {
 		int dummy = 0;
 		if(prefer ==Constant.PREFER_DINING){
 			time_slots= schedule.getDining();
-			if(!compromise)  
+			if(!compromise){  
 				dummy = expMinCrc;
+				System.out.println("No compromise dining");
+			}
+			else System.out.println("Compromise dining");
 		}
 		else{
 			time_slots= schedule.getCrc();
-			if(!compromise)
+			if(!compromise){
 				dummy = expMinDining;
+				System.out.println("No compromise crc");
+			}
+			else System.out.println("Compromise crc");
 		}
-
 		while(pool.size()>dummy){
 			boolean scheduled = false;
 			System.out.println("pool size is "+pool.size());
@@ -89,14 +94,17 @@ public class Main {
 					Student tempS = findStudent(pool.get(0).getPairId());
 					if(tempS.getPreference() == prefer || (tempS.getPreference() != prefer && compromise)){
 						//tempS.printStudentSchedule();
-						if(tempS.isAvailable(time_slots.get(j).getStartTime(), tempS.diningDuration, Constant.weekday)){
-							System.out.println("Available ^^!");
-							if(schedule.updateSchedule(pool.get(0).getPairLecture().getEndTime(), tempS.diningDuration,0)){
+						int durationTime = (dummy==expMinCrc||(dummy!=expMinCrc&& compromise))?tempS.crcDuration:tempS.diningDuration;
+						int sType = (dummy==expMinCrc ||(dummy!=expMinCrc&& compromise))?Constant.PREFER_CRC:Constant.PREFER_DINING;
+						if(tempS.isAvailable(time_slots.get(j).getStartTime(), durationTime, Constant.weekday)){
+							System.out.println("Available ^^!"+time_slots.get(j).getStartTime()+",Type: "+sType);
+							if(schedule.updateSchedule(time_slots.get(j).getStartTime(), tempS.diningDuration,sType)){
 								//Scheduled that person to the current time slot
 								//Remove all that person's pairs in the diningPool 
 								System.out.println("SCHEDULED! Remove students in pool");
 								if(minorPool.size() > 0){  //The minorPool hasn't been scheduled
-									minorPool.add(new Pair(pool.get(0).getPairId(),new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime())));
+									minorPool.add(new Pair(pool.get(0).getPairId(),
+											new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime())));
 								}
 								removeStudentFromPool(pool.get(0).getPairId(),pool);
 								scheduled = true;
@@ -141,31 +149,6 @@ public class Main {
 		m.scheduleTask(schedule, Constant.PREFER_CRC, false, m.crcPool, m.diningPool); 
 		m.scheduleTask(schedule, Constant.PREFER_DINING,true, m.diningPool, m.crcPool); 
 		m.scheduleTask(schedule, Constant.PREFER_CRC, true, m.crcPool, m.diningPool); 
-		/*while(m.diningPool.size()>0 ){
-			ArrayList<TimeSlot> dining = schedule.getDining();
-			boolean scheduled = false;
-			System.out.println("pool size is "+m.diningPool.size());
-			for(int j = 0; j < dining.size()&&!scheduled;j++){
-				System.out.println("Remain space is "+dining.get(j).getRemain()+"slot is"+j);
-				if(dining.get(j).getRemain() > 0){
-					Student tempS = m.findStudent(m.diningPool.get(0).getPairId());
-					System.out.println(tempS.getLectures("T").get(0).getStartTime() +" "+tempS.getLectures("T").get(1).getStartTime());
-					//tempS.printStudentSchedule();
-					if(tempS.isAvailable(dining.get(j).getStartTime(), tempS.diningDuration, "T")){
-						System.out.println("Available ^^!");
-						if(schedule.updateSchedule(m.diningPool.get(0).getPairLecture().getEndTime(), tempS.diningDuration,0)){
-							//Scheduled that person to the current time slot
-							//Remove all that person's pairs in the diningPool 
-							System.out.println("SCHEDULED! Remove students in pool");
-							m.removeStudentFromPool(m.diningPool.get(0).getPairId(),m.diningPool);
-							scheduled = true;
-						}
-						else m.diningPool.remove(0);
-					}
-				}	
-			}
-		}*/
-
 	}
 	
 	public static JSONArray readFile(String filename) {

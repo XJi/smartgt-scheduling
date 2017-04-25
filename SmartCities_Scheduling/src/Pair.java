@@ -32,7 +32,7 @@ public class Pair{
 		     }        
 		 };
 		 return comp;
-		}  
+	}  
 	
 	public static void main(String[] args) {
 		List<Pair> pairs = new ArrayList<Pair>();
