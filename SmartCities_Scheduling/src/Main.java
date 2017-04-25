@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -47,8 +48,6 @@ public class Main {
 	public ArrayList<Student> addStudent(String fileName){
 		JSONArray jsonObject = readFile(fileName);//"schedule.json");
 		JSONArray jsonArray = (JSONArray) jsonObject.get(0);
-		//System.out.println(jsonArray.get(3));
-		//System.out.println(jsonArray.size());
 		Student student = new Student(STUDENT_ID, 0);
 		for (int i=0; i<jsonArray.size(); ++i) {
 			JSONObject temp_jsonObject = (JSONObject) jsonArray.get(i);
@@ -173,6 +172,5 @@ public class Main {
 			Lecture lecture = new Lecture(day, begin_time, end_time);
 			s.setLectures(lecture);
 		}
-		
 	}
 }
