@@ -8,7 +8,6 @@ public class Time {
 	 * */
 	public static int convertTime(int time, int duration){
 		int temp = 0;
-		System.out.println("Time is"+time%100);
 		if(time%100+duration > 60){
 			temp = duration-60;
 			time += 100+temp;	
