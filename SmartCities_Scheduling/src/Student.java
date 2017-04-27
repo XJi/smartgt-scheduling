@@ -48,18 +48,18 @@ public class Student {
 		System.out.println("@isAvailable: Startime: "+time+",duration"+duration+",weekday:"+weekday);
 		ArrayList<Lecture> lec = this.getLectures(weekday);
 		Collections.sort(lec, getCompByEndtime());
-		if(time < lec.get(0).getStartTime()){
+		if(Time.convertTime(time, duration) <= lec.get(0).getStartTime() || time >= lec.get(lec.size()-1).getEndTime()){
 			System.out.println("@isAvailable:"+time);
 			return true;
 		}
 		for(int i = 0; i < lec.size(); i++){
 			if(lec.get(i).getEndTime() < time){
 				System.out.println("@isAvailable: getEndTime: "+lec.get(i).getEndTime());
-				if(i < lec.size()-1){
-					if(Time.convertTime(time, duration)<lec.get(i+1).getStartTime())
-						return true;
+				if(i < lec.size()-1 && Time.convertTime(time, duration)<lec.get(i+1).getStartTime()){
+					return true;
 				}
-				else return true;
+				else if(i == lec.size()-1) 
+					return true;
 			}
 		}
 		return false;
@@ -82,8 +82,9 @@ public class Student {
 		s.setLectures(new Lecture("M",930,1055));
 		
 		s.setLectures(new Lecture("T",930,1055));
+		
 		System.out.println(s.getLectures("M").get(0).getDay());
-		System.out.println(s.isAvailable(1035,30,"T"));
+		System.out.println(s.isAvailable(1800,30,"T"));
 		s.printStudentSchedule();
 	}
 

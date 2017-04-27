@@ -11,7 +11,7 @@ public class Schedule {
 		this.dining = new ArrayList<TimeSlot>();
 		this.crc = new ArrayList<TimeSlot>();
 		for(int i = 0; i < Constant.slots; i++){
-			if(i+6 < Constant.slots)
+			if(i+6 < Constant.slots && i < Constant.slots-12)
 				dining.add(new TimeSlot(Constant.start[i+6],Constant.end[i+6],Constant.space));
 			crc.add(new TimeSlot(Constant.start[i],Constant.end[i],Constant.space));
 		}
@@ -48,42 +48,27 @@ public class Schedule {
 		
 		return index;
 	}
-	public boolean updateSchedule(int startTime, int duration, int type){
-		ArrayList<TimeSlot> temp;
-		if(type == 0) // 0 refers to Dining
-			temp = this.dining;
-		else temp = this.crc;
-		for(int i = 0; i < temp.size(); i++){
-			if(temp.get(i).getStartTime() >= startTime){
-				
-				if(duration <= Constant.defaultDuration ){
-					if(temp.get(i).getRemain() > 0){
-						temp.get(i).setRemain(-1);  // Remain_space = Remain_space -1
-						System.out.println("@updateSchedule simple: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i).getEndTime());
-						sTime = temp.get(i).getStartTime();
-						endTime = temp.get(i).getEndTime();
-						return true;
-					}
-				}
-				else{
-					if(i+1 < temp.size() && temp.get(i).getRemain() > 0 && temp.get(i+1).getRemain() > 0){
-						temp.get(i).setRemain(-1);
-						temp.get(i+1).setRemain(-1);
-						System.out.println("@long updateSchedule: start: "+temp.get(i).getStartTime()+"-> end: "+temp.get(i+1).getEndTime());
-						sTime = temp.get(i).getStartTime();
-						endTime = temp.get(i+1).getEndTime();
-						return true;
-					}
-				}
-				if(i+1 >= temp.size() && temp.get(i).getRemain() > 0){
-					temp.get(i).setRemain(-1); 
-					sTime = temp.get(i).getStartTime();
-					endTime = temp.get(i).getEndTime();
-					return true;
-				}
-			}
+	public boolean updateSchedule(int startIndex, int duration, ArrayList<TimeSlot> temp){
+		if(duration <= Constant.defaultDuration && temp.get(startIndex).getRemain() > 0){
+			temp.get(startIndex).setRemain(-1);
+			System.out.println("@updateSchedule simple: start: "+temp.get(startIndex).getStartTime()+"-> end: "+temp.get(startIndex).getEndTime());
+			sTime = temp.get(startIndex).getStartTime();
+			endTime = temp.get(startIndex).getEndTime();
+			return true;
 		}
 		return false;
+	}
+	
+	public void printSchedule(){
+		System.out.println("============DINING SCHEDULE=============");
+		for(TimeSlot slot: dining){
+			System.out.println("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain());
+		}
+		System.out.println("============CRC SCHEDULE=============");
+		for(TimeSlot slot: crc){
+			System.out.println("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain());
+		}
+		
 	}
 	
 	public static void main(String args[]){
