@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -171,7 +172,6 @@ public class Main {
 			Lecture lecture = new Lecture(day, begin_time, end_time);
 			s.setLectures(lecture);
 		}
-		
 	}
 	
 	public void printPool(ArrayList<Pair> pool){
