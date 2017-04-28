@@ -12,6 +12,8 @@ public class Student {
 	int preference;
 	int diningDuration = 30;
 	int crcDuration = 30;
+	boolean crcScheduled = false;
+	boolean foodScheduled = false;
 	
 	Student(int id, int preference){
 		this.id = id;
@@ -21,6 +23,23 @@ public class Student {
 			this.lectures.put(Constant.weekdays[i], new ArrayList<Lecture>());
 		}
 	}
+	
+	public void setFoodScheduled(){
+		this.foodScheduled = true;
+	}
+	
+	public boolean getFoodScheduled(){
+		return this.foodScheduled;
+	}
+	
+	public void setCrcScheduled(){
+		this.crcScheduled = true;
+	}
+	
+	public boolean getCrcScheduled(){
+		return this.crcScheduled;
+	}
+	
 	
 	public void setLectures(Lecture lecture){
 		this.getLectures(lecture.getDay()).add(lecture);
@@ -45,16 +64,16 @@ public class Student {
 		 return comp;
 	}  
 	public boolean isAvailable(int time, int duration,String weekday){
-		System.out.println("@isAvailable: Startime: "+time+",duration"+duration+",weekday:"+weekday);
+		//System.out.println("@isAvailable: Startime: "+time+",duration"+duration+",weekday:"+weekday);
 		ArrayList<Lecture> lec = this.getLectures(weekday);
 		Collections.sort(lec, getCompByEndtime());
 		if(Time.convertTime(time, duration) <= lec.get(0).getStartTime() || time >= lec.get(lec.size()-1).getEndTime()){
-			System.out.println("@isAvailable:"+time);
+			//System.out.println("@isAvailable:"+time);
 			return true;
 		}
 		for(int i = 0; i < lec.size(); i++){
 			if(lec.get(i).getEndTime() < time){
-				System.out.println("@isAvailable: getEndTime: "+lec.get(i).getEndTime());
+				//System.out.println("@isAvailable: getEndTime: "+lec.get(i).getEndTime());
 				if(i < lec.size()-1 && Time.convertTime(time, duration)<lec.get(i+1).getStartTime()){
 					return true;
 				}
