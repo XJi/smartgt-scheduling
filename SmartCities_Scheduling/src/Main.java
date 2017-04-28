@@ -18,7 +18,7 @@ public class Main {
 	private ArrayList<Pair> crcPool;
 	private ArrayList<Pair> compDiningPool;
 	private ArrayList<Pair> compCrcPool;
-	
+
 	public Student findStudent(int id){
 		for(Student s: students){
 			if(s.getID() == id)
@@ -37,9 +37,9 @@ public class Main {
 			pool.remove(count[i]);
 		}
 	}
-	
 
-	
+
+
 	public ArrayList<Student> addStudent(String fileName){
 		JSONArray jsonObject = readFile(fileName);
 		JSONArray jsonArray = (JSONArray) jsonObject.get(0);
@@ -58,39 +58,63 @@ public class Main {
 		STUDENT_ID += 1;
 		return students;
 	}
-	
+
 	public void scheduleTask(Schedule schedule, int prefer, boolean compromise, ArrayList<Pair> pool,  ArrayList<Pair> minorPool){
 		ArrayList<TimeSlot> time_slots = (prefer ==Constant.PREFER_DINING )?schedule.getDining():schedule.getCrc();
-		while(pool.size() > 0){
-			boolean scheduled = false;			
-			for(int j = 0; j < time_slots.size()&&!scheduled;j++){
+		while(pool.size() > 0){			
+			for(int j = 0; j < time_slots.size();j++){
 				if(time_slots.get(j).getRemain() > 0 && pool.size() >0){
-					if(j > 18) System.out.println("Reach 19!");
 					Student tempS = findStudent(pool.get(0).getPairId());
-					if(tempS.getPreference() == prefer || (tempS.getPreference() != prefer && compromise)){
-						int durationTime = (time_slots.equals(schedule.getCrc()))?tempS.crcDuration:tempS.diningDuration;
-						int sType = (time_slots.equals(schedule.getCrc()))?Constant.PREFER_CRC:Constant.PREFER_DINING;
-						if(tempS.isAvailable(time_slots.get(j).getStartTime(), durationTime, Constant.weekday)){
-							System.out.println("Available ^^!"+time_slots.get(j).getStartTime()+",Type: "+sType);
-							if(schedule.updateSchedule(j, durationTime,time_slots)){
-								/*Scheduled that person to the current time slot
-								Remove all that person's pairs in the diningPool */
-								System.out.println("SCHEDULED! Remove students in pool: "+pool.get(0).getPairId());
-								if(minorPool != null && minorPool.size() > 0){  //The minorPool hasn't been scheduled
-									minorPool.add(new Pair(pool.get(0).getPairId(),
-											new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime())));
-									tempS.setLectures(new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime()));
-								}
-								removeStudentFromPool(pool.get(0).getPairId(),pool);
-								scheduled = true;								
-							}
-							else if(minorPool != null){
-								minorPool.add(pool.remove(0));
-							}
+					int durationTime = (time_slots.equals(schedule.getCrc()))?tempS.crcDuration:tempS.diningDuration;
+					//int sType = (time_slots.equals(schedule.getCrc()))?Constant.PREFER_CRC:Constant.PREFER_DINING;
+					if(tempS.isAvailable(time_slots.get(j).getStartTime(), durationTime, Constant.weekday)
+							&& schedule.updateSchedule(j, durationTime,time_slots,pool.get(0).getPairId())){
+						//System.out.println("Available ^^!"+time_slots.get(j).getStartTime()+",Type: "+sType);
+						if (time_slots.equals(schedule.getCrc()))
+							tempS.setCrcScheduled();
+						else tempS.setFoodScheduled();
+						/*Scheduled that person to the current time slot
+						//Remove all that person's pairs in the diningPool */
+						//System.out.println("SCHEDULED! Remove students in pool: "+pool.get(0).getPairId());
+						if(minorPool != null && minorPool.size() > 0){  //The minorPool hasn't been scheduled
+							minorPool.add(new Pair(pool.get(0).getPairId(),
+									new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime())));
+							tempS.setLectures(new Lecture(Constant.weekday, schedule.getStartTime(),schedule.getEndTime()));
 						}
-						else pool.remove(0);
+						removeStudentFromPool(pool.get(0).getPairId(),pool);
+						break;								
 					}
-				}	
+					else pool.remove(0);
+				}
+			}	
+		}
+	}
+	
+	public void scheduleRemainTask(Schedule schedule, String weekday){
+		for(Student s: students){
+			if(!s.getCrcScheduled()){
+				int end = s.getLectures(weekday).get(s.getLectures(weekday).size()-1).getEndTime();
+				ArrayList<TimeSlot> ts = schedule.getCrc();
+				for(int i = 0; i < ts.size(); i++){
+					if(ts.get(i).getStartTime() >= end && ts.get(i).getRemain() >0){
+						ts.get(i).setRemain(-1);
+						s.setCrcScheduled();
+						ts.get(i).updateSlot(s.getID());
+						break;
+					}
+				}
+			}
+			if(!s.getFoodScheduled()){
+				int end = s.getLectures(weekday).get(s.getLectures(weekday).size()-1).getEndTime();
+				ArrayList<TimeSlot> ts = schedule.getDining();
+				for(int i = 0; i < ts.size(); i++){
+					if(ts.get(i).getStartTime() >= end && ts.get(i).getRemain() >0){
+						ts.get(i).setRemain(-1);
+						s.setFoodScheduled();
+						ts.get(i).updateSlot(s.getID());
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -133,23 +157,20 @@ public class Main {
 		//Sort all lectures in the earliest endTime order
 		Collections.sort(m.diningPool,Pair.getCompByEndtime());
 		Collections.sort(m.crcPool,Pair.getCompByEndtime());
-		m.printPool(m.diningPool);
 		//Greedy Activity Selection
-		System.out.println("Dining pool size: crc pool size = " +m.diningPool.size()+": "+m.crcPool.size());
 		m.scheduleTask(schedule, Constant.PREFER_DINING, false, m.diningPool, m.compCrcPool); //No compromise if can't get scheduled;
 		m.scheduleTask(schedule, Constant.PREFER_CRC, false, m.crcPool, m.compDiningPool);
-		System.out.println("Dining pool size: "+m.diningPool.size()+", CRC pool size: "+m.crcPool.size());
-		
+
 		Collections.sort(m.compDiningPool,Pair.getCompByEndtime());
 		Collections.sort(m.compCrcPool,Pair.getCompByEndtime());
-		m.printPool(m.compDiningPool);
 		m.printPool(m.compCrcPool);
 		
-		//m.scheduleTask(schedule, Constant.PREFER_DINING,true, m.compDiningPool,  null);
+		m.scheduleTask(schedule, Constant.PREFER_DINING,true, m.compDiningPool, null);
 		m.scheduleTask(schedule, Constant.PREFER_CRC, true, m.compCrcPool, null); 
+		m.scheduleRemainTask(schedule,Constant.weekday );
 		schedule.printSchedule();
 	}
-	
+
 	public static JSONArray readFile(String filename) {
 		JSONParser parser = new JSONParser();
 		try {
@@ -162,7 +183,7 @@ public class Main {
 			return null;
 		}
 	}
-	
+
 	public static void constructLecture(JSONObject jsonObject, Student s) {
 		String days = (String) jsonObject.get("days");
 		for(int i = 0; i < days.length();i++){
@@ -173,7 +194,7 @@ public class Main {
 			s.setLectures(lecture);
 		}
 	}
-	
+
 	public void printPool(ArrayList<Pair> pool){
 		if(pool.equals(diningPool)|| pool.equals(compDiningPool)) System.out.print("Dining Pool ");
 		else System.out.print("CRC Pool ");
@@ -183,7 +204,7 @@ public class Main {
 		}
 		System.out.println("END--POOL");
 	}
-	
+
 	public void printStudents(ArrayList<Student> s){
 		System.out.println("============STUDENTS LIST=============");
 		for(Student student: s){

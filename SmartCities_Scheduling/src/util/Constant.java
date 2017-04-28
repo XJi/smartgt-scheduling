@@ -12,10 +12,10 @@ public class Constant {
 	
 	public static final int slots = start.length;
 	public static final String[] weekdays = {"M","T","W","R","F"};
-	public static final String[] users = {"schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json"};
+	public static final String[] users = {"schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json","schedule.json"};
 	public static final int numberOfUsers = users.length;
 	public static final int defaultDuration = 30;
-	public static final String weekday = "T";
+	public static final String weekday = "R";
 	public static final int PREFER_CRC = 1;
 	public static final int PREFER_DINING = 0;
 	

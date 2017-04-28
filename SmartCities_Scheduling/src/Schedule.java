@@ -48,13 +48,25 @@ public class Schedule {
 		
 		return index;
 	}
-	public boolean updateSchedule(int startIndex, int duration, ArrayList<TimeSlot> temp){
-		if(duration <= Constant.defaultDuration && temp.get(startIndex).getRemain() > 0){
+	public boolean updateSchedule(int startIndex, int duration, ArrayList<TimeSlot> temp,int id){
+		if(duration <= Constant.defaultDuration || startIndex == temp.size()-1){
 			temp.get(startIndex).setRemain(-1);
-			System.out.println("@updateSchedule simple: start: "+temp.get(startIndex).getStartTime()+"-> end: "+temp.get(startIndex).getEndTime());
+			//System.out.println("@updateSchedule simple: start: "+temp.get(startIndex).getStartTime()+"-> end: "+temp.get(startIndex).getEndTime());
 			sTime = temp.get(startIndex).getStartTime();
 			endTime = temp.get(startIndex).getEndTime();
+			temp.get(startIndex).updateSlot(id);
 			return true;
+		}
+		else{
+			if(startIndex+1 < temp.size() && temp.get(startIndex+1).getRemain() > 0){
+				temp.get(startIndex).setRemain(-1);
+				temp.get(startIndex+1).setRemain(-1);
+				//System.out.println("@updateSchedule simple: start: "+temp.get(startIndex).getStartTime()+"-> end: "+temp.get(startIndex+1).getEndTime());
+				sTime = temp.get(startIndex).getStartTime();
+				endTime = temp.get(startIndex+1).getEndTime();
+				temp.get(startIndex).updateSlot(id);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -62,11 +74,23 @@ public class Schedule {
 	public void printSchedule(){
 		System.out.println("============DINING SCHEDULE=============");
 		for(TimeSlot slot: dining){
-			System.out.println("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain());
+			System.out.print("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain()+" ");
+			if(slot.getUsers().size() > 0){
+				for(Integer s: slot.getUsers()){
+					System.out.print("id: "+s+" ");
+				}
+			}
+			System.out.println();
 		}
 		System.out.println("============CRC SCHEDULE=============");
 		for(TimeSlot slot: crc){
-			System.out.println("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain());
+			System.out.print("StartTime: "+slot.getStartTime()+",   EndTime: "+slot.getEndTime()+",  Remain Space: "+slot.getRemain()+"  ");
+			if(slot.getUsers().size() > 0){
+				for(Integer s: slot.getUsers()){
+					System.out.print("id: "+s+" ");
+				}
+			}
+			System.out.println();
 		}
 		
 	}
